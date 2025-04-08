@@ -6,6 +6,11 @@
 #define static_assert _Static_assert
 #endif
 
+#define TRUE    1
+#define FALSE   0
+
+#define NULL    0
+
 typedef char                    i8;
 typedef short                   i16;
 typedef int                     i32;
