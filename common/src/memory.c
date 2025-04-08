@@ -2,22 +2,38 @@
 #include <stdlib.h>
 #include <string.h>
 
-smc_mem
-smc_allocate(u64 size, b32 clear)
+b32
+smc_allocate(smc_mem *memory, u64 size, b32 clear)
 {
+    assert(memory != NULL);
+    assert(memory->ptr == NULL);
+    assert(memory->refs == 0);
     assert(size > 0);
-    smc_mem new_mem = { NULL, 0 };
 
-    if ((new_mem.ptr = malloc(size)) == NULL)
-    {
-        return new_mem;
-    }
+    if ((memory->ptr = malloc(size)) == NULL)
+        return 0;
 
-    if (clear) memset(new_mem.ptr, 0, size);
+    if (clear) memset(memory->ptr, 0, size);
 
-    smc_grab(&new_mem);
+    smc_grab(memory);
 
-    return new_mem;
+    return 1;
+}
+
+b32
+smc_reallocate(smc_mem *memory, u64 size)
+{
+    assert(memory != NULL);
+    assert(memory->ptr != NULL);
+    assert(memory->refs > 0);
+    assert(size > 0);
+
+    void* ptr = realloc(memory->ptr, size);
+    if (ptr == NULL)
+        return 0;
+
+    memory->ptr = ptr;
+    return 1;
 }
 
 void
