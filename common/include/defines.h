@@ -42,3 +42,8 @@ static_assert(sizeof(f64) == 8, "f64 must be 8 bytes");
 
 static_assert(sizeof(b8) == 1, "b8 must be 1 byte");
 static_assert(sizeof(b32) == 4, "b32 must be 4 bytes");
+
+#define U8_MAX      0xFF
+#define U16_MAX     0xFFFF
+#define U32_MAX     0xFFFFFFFF
+#define U64_MAX     0xFFFFFFFFFFFFFFFF
