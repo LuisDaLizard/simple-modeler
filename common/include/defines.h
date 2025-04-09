@@ -2,14 +2,13 @@
 
 #include <assert.h>
 
-#ifndef __WIN32__
-#define static_assert _Static_assert
+#ifndef WIN32
+#define static_assert   _Static_assert
+#define NULL    ((void*)0)
 #endif
 
 #define TRUE    1
 #define FALSE   0
-
-#define NULL    0
 
 typedef char                    i8;
 typedef short                   i16;

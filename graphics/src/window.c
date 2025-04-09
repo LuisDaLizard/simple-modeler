@@ -7,8 +7,8 @@ static u8 smg_window_count = 0;
 b32
 smg_window_create(smg_window *window, smg_window_info *info)
 {
-    assert(window);
-    assert(info);
+    assert(window != NULL);
+    assert(info != NULL);
 
     if (!smg_window_initialized)
     {
@@ -21,7 +21,7 @@ smg_window_create(smg_window *window, smg_window_info *info)
 
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 1);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, TRUE);
     glfwWindowHint(GLFW_RESIZABLE, info->resizable);
 
@@ -61,5 +61,7 @@ smg_window_should_close(smg_window *window)
     assert(window);
     assert(window->handle);
 
+    glfwPollEvents();
+    glfwSwapBuffers(window->handle);
     return glfwWindowShouldClose(window->handle);
 }
