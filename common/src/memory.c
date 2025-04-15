@@ -3,7 +3,7 @@
 #include <string.h>
 
 b32
-smc_allocate(smc_mem *memory, u64 size, b32 clear)
+smAllocate(smMem *memory, u64 size, b32 clear)
 {
     assert(memory != NULL);
     assert(memory->ptr == NULL);
@@ -21,7 +21,7 @@ smc_allocate(smc_mem *memory, u64 size, b32 clear)
 }
 
 b32
-smc_reallocate(smc_mem *memory, u64 size)
+smReallocate(smMem *memory, u64 size)
 {
     assert(memory != NULL);
     assert(memory->ptr != NULL);
@@ -37,7 +37,7 @@ smc_reallocate(smc_mem *memory, u64 size)
 }
 
 void
-smc_grab(smc_mem *memory)
+smGrab(smMem *memory)
 {
     assert(memory != NULL);
     assert(memory->ptr != NULL);
@@ -46,7 +46,7 @@ smc_grab(smc_mem *memory)
 }
 
 void
-smc_release(smc_mem *memory)
+smRelease(smMem *memory)
 {
     assert(memory != NULL);
     assert(memory->ptr != NULL);

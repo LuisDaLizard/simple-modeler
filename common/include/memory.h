@@ -6,7 +6,7 @@ typedef struct
 {
     void* ptr;
     i32 refs;
-} smc_mem;
+} smMem;
 
 /**
  * Allocate memory of the given size and sets the reference count to 1.
@@ -17,7 +17,7 @@ typedef struct
  * @return Returns 0 if the allocation failed.
  */
 b32
-smc_allocate(smc_mem *memory, u64 size, b32 clear);
+smAllocate(smMem *memory, u64 size, b32 clear);
 
 /**
  * Reallocates the memory passed in to size bytes.
@@ -27,7 +27,7 @@ smc_allocate(smc_mem *memory, u64 size, b32 clear);
  * @return Returns 0 if the allocation failed.
  */
 b32
-smc_reallocate(smc_mem *memory, u64 size);
+smReallocate(smMem *memory, u64 size);
 
 /**
  * Grabs a reference to the memory allocated in smc_mem.
@@ -35,7 +35,7 @@ smc_reallocate(smc_mem *memory, u64 size);
  * @param memory An smc_mem struct pointer with allocated memory.
  */
 void
-smc_grab(smc_mem *memory);
+smGrab(smMem *memory);
 
 /**
  * Releases the reference to memory allocated in smc_mem and frees it if
@@ -44,4 +44,4 @@ smc_grab(smc_mem *memory);
  * @param memory An smc_mem struct pointer with allocated memory.
  */
 void
-smc_release(smc_mem *memory);
+smRelease(smMem *memory);

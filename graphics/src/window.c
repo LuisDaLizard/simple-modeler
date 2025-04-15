@@ -1,22 +1,22 @@
 #include "window.h"
 #include <GLFW/glfw3.h>
 
-static b8 smg_window_initialized = FALSE;
-static u8 smg_window_count = 0;
+static b8 smWindowInitialized = FALSE;
+static u8 smWindowCount = 0;
 
 b32
-smg_window_create(smg_window *window, smg_window_info *info)
+smWindowCreate(smWindow *window, smWindowInfo *info)
 {
     assert(window != NULL);
     assert(info != NULL);
 
-    if (!smg_window_initialized)
+    if (!smWindowInitialized)
     {
         if (!glfwInit()) return 0;
-        smg_window_initialized = TRUE;
+        smWindowInitialized = TRUE;
     }
 
-    if (smg_window_count == U8_MAX)
+    if (smWindowCount == U8_MAX)
         return 0;
 
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
@@ -33,30 +33,30 @@ smg_window_create(smg_window *window, smg_window_info *info)
     glfwMakeContextCurrent(window->handle);
     glfwSwapInterval(0);
 
-    smg_window_count ++;
+    smWindowCount ++;
     return 1;
 }
 
 void
-smg_window_destroy(smg_window *window)
+smWindowDestroy(smWindow *window)
 {
     assert(window);
     assert(window->handle);
-    assert(smg_window_count > 0);
+    assert(smWindowCount > 0);
 
-    smg_window_count --;
+    smWindowCount --;
     glfwDestroyWindow(window->handle);
     window->handle = NULL;
 
-    if (!smg_window_count)
+    if (!smWindowCount)
     {
         glfwTerminate();
-        smg_window_initialized = FALSE;
+        smWindowInitialized = FALSE;
     }
 }
 
 b32
-smg_window_should_close(smg_window *window)
+smWindowShouldClose(smWindow *window)
 {
     assert(window);
     assert(window->handle);
