@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <window.h>
 #include <graphics.h>
+#include <shader.h>
 
 #include "constants.h"
 
@@ -19,6 +20,16 @@ int main()
 
     if (!smGraphicsInit())
         return 1;
+
+    smShaderInfo shaderInfo =
+    {
+        "#version 410 core\nlayout(location=0) in vec3 aPosition;\nvoid main() { gl_Position = vec4(aPosition, 0); }",
+        "#version 410 core\nout vec4 oColor;\nvoid main() { oColor = vec4(1, 0, 0, 1); }"
+    };
+
+    smShader shader = {};
+
+    smShaderCreate(&shader, &shaderInfo);
 
     while (!smWindowShouldClose(&window))
     {
