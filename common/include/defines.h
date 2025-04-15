@@ -46,7 +46,8 @@ static_assert(sizeof(b32) == 4, "b32 must be 4 bytes");
 
 static_assert(sizeof(rgba8) == 4, "rgba8 must be 4 bytes");
 
-#define HEX_TO_RGBA8(hex) { (hex >> 24) & 0xFF, (hex >> 16) & 0xFF, (hex >> 8) & 0xFF, hex & 0xFF }
+#define HEX_TO_RGBA8(hex) { hex & 0xFF, (hex >> 8) & 0xFF, (hex >> 16) & 0xFF, (hex >> 24) & 0xFF }
+#define RGBA8_TO_HEX(rgba8) ( *((u32*)&rgba8) )
 
 #define U8_MAX      0xFF
 #define U16_MAX     0xFFFF
