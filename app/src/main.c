@@ -2,13 +2,15 @@
 #include <window.h>
 #include <graphics.h>
 
+#include "constants.h"
+
 int main()
 {
     smWindow window = { 0 };
     smWindowInfo settings =
     {
-        "Simple Modeler",
-        800, 600,
+        WINDOW_TITLE,
+        WINDOW_WIDTH, WINDOW_HEIGHT,
         TRUE,
     };
 
@@ -18,12 +20,12 @@ int main()
     if (!smGraphicsInit())
         return 1;
 
-
     while (!smWindowShouldClose(&window))
     {
-        smClearColor(0.08f, 0.1f, 0.15f);
+        smClearColor(BACKGROUND_COLOR);
         smClear(FALSE);
     }
 
     smWindowDestroy(&window);
+    return 0;
 }

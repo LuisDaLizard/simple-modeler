@@ -11,9 +11,14 @@ smGraphicsInit()
 }
 
 void
-smClearColor(f32 r, f32 g, f32 b)
+smClearColor(const rgba8 color)
 {
-    glClearColor(r, g, b, 1.0f);
+    f32 r = (f32)color.r / 255.0f;
+    f32 g = (f32)color.g / 255.0f;
+    f32 b = (f32)color.b / 255.0f;
+    f32 a = (f32)color.a / 255.0f;
+
+    glClearColor(r, g, b, a);
 }
 
 void
