@@ -12,6 +12,7 @@ smQuit(i32 code)
 #if WIN32 && !DEBUG
     PostQuitMessage(code);
 #else
+    extern void exit(int);
     exit(code);
 #endif
 }
@@ -21,7 +22,7 @@ smAssert(b64 condition, const char *function, int line)
 {
     if (condition) return;
 
-    fprintf(stdout, "Assertion failed (%s : %d)\n", function, line); // TODO: Logging
+    fprintf(stdout, "Assertion failed at %s:%d\n", function, line); // TODO: Logging
     smQuit(0);
 }
 
@@ -30,6 +31,6 @@ smAssertF(b64 condition, const char *msg, const char *function, int line)
 {
     if (condition) return;
 
-    fprintf(stdout, "Assertion failed (%s : %d): %s\n", function, line, msg); // TODO: Logging
+    fprintf(stdout, "Assertion failed at %s:%d: %s\n", function, line, msg); // TODO: Logging
     smQuit(0);
 }

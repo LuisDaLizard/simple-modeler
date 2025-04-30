@@ -3,6 +3,7 @@
 #include <shader.h>
 
 #include "constants.h"
+#include "shaders.h"
 
 #if WIN32
 #include <windows.h>
@@ -30,8 +31,8 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 
     smShaderInfo shaderInfo =
     {
-        "#version 410 core\nlayout(location=0) in vec3 aPosition;\nvoid main() { gl_Position = vec4(aPosition, 0); }",
-        "#version 410 core\nout vec4 oColor;\nvoid main() { oColor = vec4(1, 0, 0, 1); }"
+            DEFAULT_VERTEX_SHADER,
+            DEFAULT_FRAGMENT_SHADER
     };
 
     smShader shader = {};
