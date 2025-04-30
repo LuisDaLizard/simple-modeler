@@ -53,3 +53,11 @@ static_assert(sizeof(rgba8) == 4, "rgba8 must be 4 bytes");
 #define U16_MAX     0xFFFF
 #define U32_MAX     0xFFFFFFFF
 #define U64_MAX     0xFFFFFFFFFFFFFFFF
+
+#define MESSAGE_BUFFER_MAX 512
+
+void
+smAssert(b32 condition);
+
+void
+smAssertF(b32 condition, const char *format, ...);

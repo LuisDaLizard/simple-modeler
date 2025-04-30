@@ -1,11 +1,14 @@
-#include <stdio.h>
 #include <window.h>
 #include <graphics.h>
 #include <shader.h>
 
 #include "constants.h"
 
-int main()
+#ifdef WIN32
+
+#include <windows.h>
+
+int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine, int nCmdShow)
 {
     smWindow window = { 0 };
     smWindowInfo settings =
@@ -38,5 +41,11 @@ int main()
     }
 
     smWindowDestroy(&window);
+
+    smAssertF(FALSE, "Hello, World!");
+
     return 0;
 }
+
+
+#endif

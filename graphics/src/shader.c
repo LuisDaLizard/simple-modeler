@@ -161,7 +161,7 @@ smShaderGLShaderTypeSize(u32 glType)
 static void
 smShaderUniformLayout(smShader *shader)
 {
-    smMem temp;
+    smMem temp = { 0 };
     i32 bufferSize;
 
     glGetProgramiv(shader->program, GL_ACTIVE_UNIFORMS, &shader->uniformLayout.count);
@@ -190,7 +190,7 @@ smShaderUniformLayout(smShader *shader)
 static void
 smShaderAttributeLayout(smShader *shader)
 {
-    smMem temp;
+    smMem temp = { 0 };
     i32 bufferSize;
 
     shader->attributeLayout.stride = 0;
