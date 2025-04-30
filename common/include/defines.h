@@ -1,7 +1,5 @@
 #pragma once
 
-#include <assert.h>
-
 #ifndef WIN32
 #define static_assert   _Static_assert
 #define NULL    ((void*)0)
@@ -23,8 +21,9 @@ typedef unsigned long long          u64;
 typedef float                       f32;
 typedef double                      f64;
 
-typedef char                        b8;
-typedef int                         b32;
+typedef i8                          b8;
+typedef i32                         b32;
+typedef i64                         b64;
 
 typedef struct { u8 r, g, b, a; }   rgba8;
 
@@ -43,6 +42,7 @@ static_assert(sizeof(f64) == 8, "f64 must be 8 bytes");
 
 static_assert(sizeof(b8) == 1, "b8 must be 1 byte");
 static_assert(sizeof(b32) == 4, "b32 must be 4 bytes");
+static_assert(sizeof(b64) == 8, "b64 must be 8 bytes");
 
 static_assert(sizeof(rgba8) == 4, "rgba8 must be 4 bytes");
 
@@ -54,10 +54,14 @@ static_assert(sizeof(rgba8) == 4, "rgba8 must be 4 bytes");
 #define U32_MAX     0xFFFFFFFF
 #define U64_MAX     0xFFFFFFFFFFFFFFFF
 
-#define MESSAGE_BUFFER_MAX 512
+void
+smQuit(i32 code);
 
 void
-smAssert(b32 condition);
+smAssert(b64 condition, const char *function, int line);
 
 void
-smAssertF(b32 condition, const char *format, ...);
+smAssertF(b64 condition, const char *msg, const char *function, int line);
+
+#define assert(b) smAssert((b64)(b), __FUNCTION__, __LINE__)
+#define assertf(b, msg) smAssertF((b64)(b), msg, __FUNCTION__, __LINE__)

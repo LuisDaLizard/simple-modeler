@@ -7,26 +7,29 @@
 #endif
 
 void
-smAssert(b32 condition)
+smQuit(i32 code)
 {
-    if (condition) return;
-
-    PostQuitMessage(0);
+#if WIN32 && !DEBUG
+    PostQuitMessage(code);
+#else
+    exit(code);
+#endif
 }
 
 void
-smAssertF(b32 condition, const char *format, ...)
+smAssert(b64 condition, const char *function, int line)
 {
     if (condition) return;
 
-    char buffer[MESSAGE_BUFFER_MAX];
+    fprintf(stdout, "Assertion failed (%s : %d)\n", function, line); // TODO: Logging
+    smQuit(0);
+}
 
-    va_list args;
-    va_start(args, format);
-    vsprintf_s(buffer, MESSAGE_BUFFER_MAX, format, args);
-    va_end(args);
+void
+smAssertF(b64 condition, const char *msg, const char *function, int line)
+{
+    if (condition) return;
 
-    MessageBoxA(0, buffer, NULL, MB_ABORTRETRYIGNORE | MB_ICONERROR);
-
-    PostQuitMessage(0);
+    fprintf(stdout, "Assertion failed (%s : %d): %s\n", function, line, msg); // TODO: Logging
+    smQuit(0);
 }

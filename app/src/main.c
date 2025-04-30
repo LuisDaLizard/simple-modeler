@@ -4,11 +4,15 @@
 
 #include "constants.h"
 
-#ifdef WIN32
-
+#if WIN32
 #include <windows.h>
+#endif
 
+#if DEBUG
+int main(i32 argc, char *argv[])
+#elif WIN32
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine, int nCmdShow)
+#endif
 {
     smWindow window = { 0 };
     smWindowInfo settings =
@@ -42,10 +46,8 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 
     smWindowDestroy(&window);
 
-    smAssertF(FALSE, "Hello, World!");
+    assertf(0, "BRO");
 
     return 0;
 }
 
-
-#endif

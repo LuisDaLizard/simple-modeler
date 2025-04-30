@@ -65,7 +65,7 @@ void
 smShaderBind(smShader *shader);
 
 smUniformLayout
-smShaderGetUniformLayout(smShader *shader);
+smShaderGetUniformLayout(const smShader *shader);
 
 smAttributeLayout
-smShaderGetAttributeLayout(smShader *shader);
+smShaderGetAttributeLayout(const smShader *shader);
