@@ -15,7 +15,7 @@ smAllocate(smMem *memory, u64 size, b32 clear)
 
     if (clear) memset(memory->ptr, 0, size);
 
-    smc_grab(memory);
+    smGrab(memory);
 
     return 1;
 }

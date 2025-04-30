@@ -1,6 +1,7 @@
 #pragma once
 
 #include <defines.h>
+#include <memory.h>
 
 typedef struct
 {
@@ -10,21 +11,48 @@ typedef struct
 
 typedef enum
 {
+    SHADER_TYPE_INVALID = 0,
+    SHADER_TYPE_FLOAT,
+    SHADER_TYPE_VEC2,
+    SHADER_TYPE_VEC3,
+    SHADER_TYPE_VEC4,
+    SHADER_TYPE_MAT2,
+    SHADER_TYPE_MAT3,
+    SHADER_TYPE_MAT4,
+} smShaderType;
 
-} smUniformType;
+typedef struct
+{
+    // char *name;
+    i32 count, size;
+    smShaderType type;
+} smUniform;
+
+typedef struct
+{
+    // char *name;
+    i32 count, size;
+    smShaderType type;
+} smAttribute;
 
 typedef struct
 {
     i32 count;
-    u32 *sizes;
-    char *names;
-    smUniformType *types;
+    smMem uniforms;
 } smUniformLayout;
 
 typedef struct
 {
+    i32 count;
+    i32 stride;
+    smMem attributes;
+} smAttributeLayout;
+
+typedef struct
+{
     u32 program;
-    smUniformLayout uniforms;
+    smUniformLayout uniformLayout;
+    smAttributeLayout attributeLayout;
 } smShader;
 
 b32
@@ -36,3 +64,8 @@ smShaderDestroy(smShader *shader);
 void
 smShaderBind(smShader *shader);
 
+smUniformLayout
+smShaderGetUniformLayout(smShader *shader);
+
+smAttributeLayout
+smShaderGetAttributeLayout(smShader *shader);

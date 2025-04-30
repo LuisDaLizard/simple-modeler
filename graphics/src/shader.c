@@ -3,6 +3,18 @@
 #include <glad/glad.h>
 #include <stdio.h>
 
+static smShaderType
+smShaderGLShaderType(u32 glType);
+
+static i32
+smShaderGLShaderTypeSize(u32 glType);
+
+static void
+smShaderUniformLayout(smShader *shader);
+
+static void
+smShaderAttributeLayout(smShader *shader);
+
 b32
 smShaderCreate(smShader *shader, smShaderInfo *info)
 {
@@ -16,7 +28,6 @@ smShaderCreate(smShader *shader, smShaderInfo *info)
     i32 success = TRUE;
     char log[512];
 
-    // Create Vertex shader
     vertex = glCreateShader(GL_VERTEX_SHADER);
     glShaderSource(vertex, 1, &info->vertSource, NULL);
     glCompileShader(vertex);
@@ -46,9 +57,13 @@ smShaderCreate(smShader *shader, smShaderInfo *info)
     glGetProgramiv(shader->program, GL_LINK_STATUS, &success);
 
     if (!success)
+    {
         glGetProgramInfoLog(shader->program, 512, NULL, log);
+        goto end;
+    }
 
-    glGetProgramiv(shader->program, GL_ACTIVE_UNIFORMS, &shader->uniforms.count);
+    smShaderUniformLayout(shader);
+    smShaderAttributeLayout(shader);
 
 end:
     glDeleteShader(vertex);
@@ -69,6 +84,7 @@ smShaderDestroy(smShader *shader)
     assert(shader);
     assert(shader->program);
 
+    smRelease(&shader->uniformLayout.uniforms);
     glDeleteProgram(shader->program);
 }
 
@@ -79,4 +95,125 @@ smShaderBind(smShader *shader)
     assert(shader->program);
 
     glUseProgram(shader->program);
+}
+
+smUniformLayout
+smShaderGetUniformLayout(const smShader *shader)
+{
+    return shader->uniformLayout;
+}
+
+smAttributeLayout
+smShaderGetAttributeLayout(const smShader *shader)
+{
+    return shader->attributeLayout;
+}
+
+static smShaderType
+smShaderGLShaderType(u32 glType)
+{
+    switch (glType)
+    {
+        case GL_FLOAT:
+            return SHADER_TYPE_FLOAT;
+        case GL_FLOAT_VEC2:
+            return SHADER_TYPE_VEC2;
+        case GL_FLOAT_VEC3:
+            return SHADER_TYPE_VEC3;
+        case GL_FLOAT_VEC4:
+            return SHADER_TYPE_VEC4;
+        case GL_FLOAT_MAT2:
+            return SHADER_TYPE_MAT2;
+        case GL_FLOAT_MAT3:
+            return SHADER_TYPE_MAT3;
+        case GL_FLOAT_MAT4:
+            return SHADER_TYPE_MAT4;
+
+        default:
+            return SHADER_TYPE_INVALID;
+    }
+}
+
+static i32
+smShaderGLShaderTypeSize(u32 glType)
+{
+    switch (glType)
+    {
+        case GL_FLOAT:
+            return 4;
+        case GL_FLOAT_VEC2:
+            return 8;
+        case GL_FLOAT_VEC3:
+            return 12;
+        case GL_FLOAT_VEC4:
+        case GL_FLOAT_MAT2:
+            return 16;
+        case GL_FLOAT_MAT3:
+            return 36;
+        case GL_FLOAT_MAT4:
+            return 64;
+
+        default:
+            return -1;
+    }
+}
+
+static void
+smShaderUniformLayout(smShader *shader)
+{
+    smMem temp;
+    i32 bufferSize;
+
+    glGetProgramiv(shader->program, GL_ACTIVE_UNIFORMS, &shader->uniformLayout.count);
+
+    if (shader->uniformLayout.count == 0) return;
+
+    smAllocate(&shader->uniformLayout.uniforms, shader->uniformLayout.count * sizeof(smUniform), FALSE);
+    glGetProgramiv(shader->program, GL_ACTIVE_UNIFORM_MAX_LENGTH, &bufferSize);
+    smAllocate(&temp, bufferSize, TRUE);
+
+    smUniform *uniforms = shader->uniformLayout.uniforms.ptr;
+
+    for (i32 i = 0; i < shader->uniformLayout.count; i++)
+    {
+        i32 length;
+        u32 type;
+
+        glGetActiveUniform(shader->program, i, bufferSize, &length, &uniforms[i].count, &type, temp.ptr);
+        uniforms[i].type = smShaderGLShaderType(type);
+        uniforms[i].size = smShaderGLShaderTypeSize(type);
+    }
+
+    smRelease(&temp);
+}
+
+static void
+smShaderAttributeLayout(smShader *shader)
+{
+    smMem temp;
+    i32 bufferSize;
+
+    shader->attributeLayout.stride = 0;
+    glGetProgramiv(shader->program, GL_ACTIVE_ATTRIBUTES, &shader->attributeLayout.count);
+
+    if (shader->attributeLayout.count == 0) return;
+
+    smAllocate(&shader->attributeLayout.attributes, shader->attributeLayout.count * sizeof(smAttribute), FALSE);
+    glGetProgramiv(shader->program, GL_ACTIVE_ATTRIBUTE_MAX_LENGTH, &bufferSize);
+    smAllocate(&temp, bufferSize, TRUE);
+
+    smAttribute *attributes = shader->attributeLayout.attributes.ptr;
+
+    for (i32 i = 0; i < shader->attributeLayout.count; i++)
+    {
+        i32 length;
+        u32 type;
+
+        glGetActiveAttrib(shader->program, i, bufferSize, &length, &attributes[i].count, &type, temp.ptr);
+        attributes[i].type = smShaderGLShaderType(type);
+        attributes[i].size = smShaderGLShaderTypeSize(type);
+        shader->attributeLayout.stride += attributes[i].count * attributes[i].size;
+    }
+
+    smRelease(&temp);
 }
