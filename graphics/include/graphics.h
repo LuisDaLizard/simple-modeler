@@ -6,7 +6,7 @@ int
 smGraphicsInit();
 
 void
-smClearColor(const rgba8 color);
+smClearColor(rgba8 color);
 
 void
 smClear(b32 depth);

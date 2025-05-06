@@ -1,6 +1,6 @@
 #include <window.h>
 #include <graphics.h>
-#include <shader.h>
+#include <mesh.h>
 
 #include "constants.h"
 #include "shaders.h"
@@ -36,18 +36,28 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
     };
 
     smShader shader = {};
-
     smShaderCreate(&shader, &shaderInfo);
+
+    smMeshInfo meshInfo =
+    {
+            sizeof(VERTICES),
+            VERTICES,
+            shader.attributeLayout
+    };
+
+    smMesh mesh = {};
+    smMeshCreate(&mesh, &meshInfo);
 
     while (!smWindowShouldClose(&window))
     {
         smClearColor(BACKGROUND_COLOR);
         smClear(FALSE);
+
+        smShaderBind(&shader);
+        smMeshDraw(&mesh);
     }
 
     smWindowDestroy(&window);
-
-    assertf(0, "BRO");
 
     return 0;
 }

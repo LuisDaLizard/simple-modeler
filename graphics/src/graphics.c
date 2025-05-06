@@ -7,6 +7,7 @@ smGraphicsInit()
 {
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
         return 0;
+
     return 1;
 }
 

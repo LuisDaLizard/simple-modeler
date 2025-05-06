@@ -1,5 +1,9 @@
 #include "window.h"
+
+#define GL_SILENCE_DEPRECATION
+#define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
+#include <OpenGL/gl3.h>
 
 static b8 smWindowInitialized = FALSE;
 static u8 smWindowCount = 0;
@@ -22,7 +26,7 @@ smWindowCreate(smWindow *window, smWindowInfo *info)
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
-    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, TRUE);
+    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GLFW_TRUE);
     glfwWindowHint(GLFW_RESIZABLE, info->resizable);
 
     window->handle = glfwCreateWindow(info->width, info->height, info->title, NULL, NULL);
@@ -31,7 +35,7 @@ smWindowCreate(smWindow *window, smWindowInfo *info)
         return 0;
 
     glfwMakeContextCurrent(window->handle);
-    glfwSwapInterval(0);
+    glfwSwapInterval(1);
 
     smWindowCount ++;
     return 1;
@@ -60,6 +64,10 @@ smWindowShouldClose(smWindow *window)
 {
     assert(window);
     assert(window->handle);
+
+    int width, height;
+    glfwGetFramebufferSize(window->handle, &width, &height);
+    glViewport(0, 0, width, height);
 
     glfwPollEvents();
     glfwSwapBuffers(window->handle);

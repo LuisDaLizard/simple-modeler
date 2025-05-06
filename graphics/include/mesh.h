@@ -5,26 +5,20 @@
 
 typedef struct
 {
-    i32 vertexCount;
-    i32 indexCount;
-
+    u32 vertexDataSize;
     f32 *vertices;
-    u32 *indices;
 
-    smShader *shader;
+    smAttributeLayout layout;
 } smMeshInfo;
 
 typedef struct
 {
-    u32 vbo, ebo;
     u32 vao;
+    u32 vbo;
 
     i32 vertexCount;
-    i32 indexCount;
 
-    smShader *shader;
-    smAttributeLayout attributes;
-    smUniformLayout uniforms;
+    smAttributeLayout layout;
 } smMesh;
 
 b32
@@ -32,3 +26,6 @@ smMeshCreate(smMesh *mesh, smMeshInfo *info);
 
 void
 smMeshDestroy(smMesh *mesh);
+
+void
+smMeshDraw(smMesh *mesh);
