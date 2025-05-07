@@ -1,6 +1,7 @@
 #include <window.h>
 #include <graphics.h>
 #include <mesh.h>
+#include <texture.h>
 
 #include "constants.h"
 #include "shaders.h"
@@ -48,11 +49,27 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
     smMesh mesh = {};
     smMeshCreate(&mesh, &meshInfo);
 
+    u8 data[3] = {0x1A, 0xFF, 0x1A };
+
+    smTextureInfo textureInfo =
+    {
+            WRAP_REPEAT,
+            WRAP_REPEAT,
+            FILTER_NEAREST,
+            FILTER_NEAREST,
+            1, 1, 3,
+            data,
+    };
+
+    smTexture texture = {};
+    smTextureCreate(&texture, &textureInfo);
+
     while (!smWindowShouldClose(&window))
     {
         smClearColor(BACKGROUND_COLOR);
         smClear(FALSE);
 
+        smTextureBind(&texture, 0);
         smShaderBind(&shader);
         smMeshDraw(&mesh);
     }

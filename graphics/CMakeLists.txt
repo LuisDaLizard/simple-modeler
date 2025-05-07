@@ -7,7 +7,8 @@ set(GRAPHICS_INCLUDE
         include/
         ../common/include
         ${THIRD_PARTY}/glfw/include
-        ${THIRD_PARTY}/glad/include )
+        ${THIRD_PARTY}/glad/include
+        ${THIRD_PARTY}/nuklear)
 
 set(GRAPHICS_LIBRARIES
         simple-model-common
