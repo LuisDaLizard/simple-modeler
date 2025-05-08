@@ -13,5 +13,5 @@ elseif(${CMAKE_BUILD_TYPE} STREQUAL "Release")
 
 endif()
 
-target_include_directories(simple-model-app PRIVATE include ../common/include ../graphics/include)
-target_link_libraries(simple-model-app simple-model-common simple-model-graphics)
+target_include_directories(simple-model-app PRIVATE include ../common/include ../graphics/include ${THIRD_PARTY}/cglm/include)
+target_link_libraries(simple-model-app simple-model-common simple-model-graphics cglm)

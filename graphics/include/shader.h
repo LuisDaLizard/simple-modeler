@@ -2,6 +2,7 @@
 
 #include <defines.h>
 #include <memory.h>
+#include <cglm/struct.h>
 
 typedef struct
 {
@@ -63,8 +64,20 @@ smShaderDestroy(smShader *shader);
 void
 smShaderBind(smShader *shader);
 
-smUniformLayout
-smShaderGetUniformLayout(const smShader *shader);
+void
+smShaderSetUniform1i(smShader *shader, const char *name, i32 value);
 
-smAttributeLayout
-smShaderGetAttributeLayout(const smShader *shader);
+void
+smShaderSetUniform1f(smShader *shader, const char *name, f32 value);
+
+void
+smShaderSetUniform2f(smShader *shader, const char *name, vec2s value);
+
+void
+smShaderSetUniform3f(smShader *shader, const char *name, vec3s value);
+
+void
+smShaderSetUniform4f(smShader *shader, const char *name, vec4s value);
+
+void
+smShaderSetUniformMat4(smShader *shader, const char *name, mat4s value);

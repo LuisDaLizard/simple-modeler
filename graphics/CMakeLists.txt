@@ -8,12 +8,14 @@ set(GRAPHICS_INCLUDE
         ../common/include
         ${THIRD_PARTY}/glfw/include
         ${THIRD_PARTY}/glad/include
-        ${THIRD_PARTY}/nuklear)
+        ${THIRD_PARTY}/nuklear
+        ${THIRD_PARTY}/cglm/include)
 
 set(GRAPHICS_LIBRARIES
         simple-model-common
         glfw
-        glad )
+        glad
+        cglm)
 
 if(APPLE)
     set(GRAPHICS_LIBRARIES ${GRAPHICS_LIBRARIES}

@@ -15,6 +15,9 @@ smShaderUniformLayout(smShader *shader);
 static void
 smShaderAttributeLayout(smShader *shader);
 
+static i32
+smShaderGetUniformLocation(smShader *shader, const char *name);
+
 b32
 smShaderCreate(smShader *shader, smShaderInfo *info)
 {
@@ -97,17 +100,66 @@ smShaderBind(smShader *shader)
     glUseProgram(shader->program);
 }
 
-smUniformLayout
-smShaderGetUniformLayout(const smShader *shader)
+void
+smShaderSetUniform1i(smShader *shader, const char *name, i32 value)
 {
-    return shader->uniformLayout;
+    i32 location = smShaderGetUniformLocation(shader, name);
+    if (location < 0) return;
+
+    smShaderBind(shader);
+    glUniform1i(location, value);
 }
 
-smAttributeLayout
-smShaderGetAttributeLayout(const smShader *shader)
+void
+smShaderSetUniform1f(smShader *shader, const char *name, f32 value)
 {
-    return shader->attributeLayout;
+    i32 location = smShaderGetUniformLocation(shader, name);
+    if (location < 0) return;
+
+    smShaderBind(shader);
+    glUniform1f(location, value);
 }
+
+void
+smShaderSetUniform2f(smShader *shader, const char *name, vec2s value)
+{
+    i32 location = smShaderGetUniformLocation(shader, name);
+    if (location < 0) return;
+
+    smShaderBind(shader);
+    glUniform2f(location, value.x, value.y);
+}
+
+void
+smShaderSetUniform3f(smShader *shader, const char *name, vec3s value)
+{
+    i32 location = smShaderGetUniformLocation(shader, name);
+    if (location < 0) return;
+
+    smShaderBind(shader);
+    glUniform3f(location, value.x, value.y, value.z);
+}
+
+void
+smShaderSetUniform4f(smShader *shader, const char *name, vec4s value)
+{
+    i32 location = smShaderGetUniformLocation(shader, name);
+    if (location < 0) return;
+
+    smShaderBind(shader);
+    glUniform4f(location, value.x, value.y, value.z, value.w);
+}
+
+void
+smShaderSetUniformMat4(smShader *shader, const char *name, mat4s value)
+{
+    i32 location = smShaderGetUniformLocation(shader, name);
+    if (location < 0) return;
+
+    smShaderBind(shader);
+    glUniformMatrix4fv(location, 1, GL_FALSE, (f32 *)&value);
+}
+
 
 static smShaderType
 smShaderGLShaderType(u32 glType)
@@ -224,4 +276,10 @@ smShaderAttributeLayout(smShader *shader)
     }
 
     smRelease(&name);
+}
+
+static i32
+smShaderGetUniformLocation(smShader *shader, const char *name)
+{
+    return glGetUniformLocation(shader->program, name);
 }
