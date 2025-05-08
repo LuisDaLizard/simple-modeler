@@ -36,6 +36,8 @@ b32 smWindowCreate(smWindow *window, smWindowInfo *info)
     if (!window->handle)
         return 0;
 
+    window->input = (smInput){ 0 };
+
     glfwMakeContextCurrent(window->handle);
     glfwSetWindowUserPointer(window->handle, window);
     glfwSwapInterval(1);
