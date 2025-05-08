@@ -50,37 +50,8 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
     smMesh mesh = {};
     smMeshCreate(&mesh, &meshInfo);
 
-    // smFont font;
-    // smFontCreate(&font);
-
-    const i32 channels = 4;
-    const i32 width = 16;
-    const i32 height = 16;
-
-    u8 pixels[height][width][channels];
-    for (i32 i = 0; i < height; i++)
-    {
-        for (i32 j = 0; j < width; j++)
-        {
-            u8 c = ((((i&0x8)==0)^((j&0x8))==0))*255;
-
-            pixels[i][j][0] = c;
-            pixels[i][j][1] = c;
-            pixels[i][j][2] = c;
-            pixels[i][j][3] = 255;
-        }
-    }
-
-    smTextureInfo textureInfo = {
-            WRAP_REPEAT, WRAP_REPEAT,
-            FILTER_NEAREST, FILTER_NEAREST,
-            width, height, channels,
-            pixels
-    };
-
-    smTexture texture = {};
-    smTextureCreate(&texture, &textureInfo);
-
+    smFont font;
+    smFontCreate(&font);
 
     while (!smWindowShouldClose(&window))
     {
@@ -88,7 +59,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
         smClear(FALSE);
 
         smShaderBind(&shader);
-        smTextureBind(&texture, 0);
+        smTextureBind(&font.texture, 0);
         smMeshDraw(&mesh);
     }
 
