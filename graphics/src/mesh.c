@@ -27,8 +27,8 @@ smMeshCreate(smMesh *mesh, smMeshInfo *info)
         smAttribute attrib = ((smAttribute *)mesh->layout.attributes.ptr)[i];
         u32 components = attrib.size / sizeof(f32);
 
-        glVertexAttribPointer(i, (i32)components, GL_FLOAT, GL_FALSE, mesh->layout.stride, (void *)offset);
-        glEnableVertexAttribArray(i);
+        glVertexAttribPointer(attrib.location, (i32)components, GL_FLOAT, GL_FALSE, mesh->layout.stride, (void *)offset);
+        glEnableVertexAttribArray(attrib.location);
 
         offset += components * sizeof(f32);
     }

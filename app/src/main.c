@@ -1,7 +1,8 @@
 #include <window.h>
 #include <graphics.h>
 #include <mesh.h>
-#include <texture.h>
+#include <font.h>
+#include <printf.h>
 
 #include "constants.h"
 #include "shaders.h"
@@ -49,28 +50,45 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
     smMesh mesh = {};
     smMeshCreate(&mesh, &meshInfo);
 
-    u8 data[3] = {0x1A, 0xFF, 0x1A };
+    // smFont font;
+    // smFontCreate(&font);
 
-    smTextureInfo textureInfo =
+    const i32 channels = 4;
+    const i32 width = 16;
+    const i32 height = 16;
+
+    u8 pixels[height][width][channels];
+    for (i32 i = 0; i < height; i++)
     {
-            WRAP_REPEAT,
-            WRAP_REPEAT,
-            FILTER_NEAREST,
-            FILTER_NEAREST,
-            1, 1, 3,
-            data,
+        for (i32 j = 0; j < width; j++)
+        {
+            u8 c = ((((i&0x8)==0)^((j&0x8))==0))*255;
+
+            pixels[i][j][0] = c;
+            pixels[i][j][1] = c;
+            pixels[i][j][2] = c;
+            pixels[i][j][3] = 255;
+        }
+    }
+
+    smTextureInfo textureInfo = {
+            WRAP_REPEAT, WRAP_REPEAT,
+            FILTER_NEAREST, FILTER_NEAREST,
+            width, height, channels,
+            pixels
     };
 
     smTexture texture = {};
     smTextureCreate(&texture, &textureInfo);
+
 
     while (!smWindowShouldClose(&window))
     {
         smClearColor(BACKGROUND_COLOR);
         smClear(FALSE);
 
-        smTextureBind(&texture, 0);
         smShaderBind(&shader);
+        smTextureBind(&texture, 0);
         smMeshDraw(&mesh);
     }
 

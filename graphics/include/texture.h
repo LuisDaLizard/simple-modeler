@@ -4,7 +4,7 @@
 
 typedef enum
 {
-    WRAP_REPEAT,
+    WRAP_REPEAT = 0x2901,
     WRAP_MIRRORED_REPEAT,
     WRAP_CLAMP_TO_EDGE,
     WRAP_CLAMP_TO_BORDER,
@@ -12,7 +12,7 @@ typedef enum
 
 typedef enum
 {
-    FILTER_NEAREST,
+    FILTER_NEAREST = 0x2600,
     FILTER_LINEAR,
 } smTextureFilter;
 
@@ -22,7 +22,7 @@ typedef struct
     smTextureFilter filterMin, filterMag;
 
     i32 width, height, channels;
-    u8 *data;
+    const u8 *data;
 } smTextureInfo;
 
 typedef struct

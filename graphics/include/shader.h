@@ -30,8 +30,7 @@ typedef struct
 
 typedef struct
 {
-    // char *name;
-    i32 count, size;
+    i32 count, size, location;
     smShaderType type;
 } smAttribute;
 

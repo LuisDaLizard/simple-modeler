@@ -190,7 +190,7 @@ smShaderUniformLayout(smShader *shader)
 static void
 smShaderAttributeLayout(smShader *shader)
 {
-    smMem temp = { 0 };
+    smMem name = { 0 };
     i32 bufferSize;
 
     shader->attributeLayout.stride = 0;
@@ -200,7 +200,7 @@ smShaderAttributeLayout(smShader *shader)
 
     smAllocate(&shader->attributeLayout.attributes, shader->attributeLayout.count * sizeof(smAttribute), FALSE);
     glGetProgramiv(shader->program, GL_ACTIVE_ATTRIBUTE_MAX_LENGTH, &bufferSize);
-    smAllocate(&temp, bufferSize, TRUE);
+    smAllocate(&name, bufferSize, TRUE);
 
     smAttribute *attributes = shader->attributeLayout.attributes.ptr;
 
@@ -208,12 +208,20 @@ smShaderAttributeLayout(smShader *shader)
     {
         i32 length;
         u32 type;
+        i32 count;
 
-        glGetActiveAttrib(shader->program, i, bufferSize, &length, &attributes[i].count, &type, temp.ptr);
-        attributes[i].type = smShaderGLShaderType(type);
-        attributes[i].size = smShaderGLShaderTypeSize(type);
-        shader->attributeLayout.stride += attributes[i].count * attributes[i].size;
+        glGetActiveAttrib(shader->program, i, bufferSize, &length, &count, &type, name.ptr);
+        ((char *)name.ptr)[length] = '\0';
+
+        i32 location = glGetAttribLocation(shader->program, name.ptr);
+
+        attributes[location].location = location;
+        attributes[location].count = count;
+        attributes[location].type = smShaderGLShaderType(type);
+        attributes[location].size = smShaderGLShaderTypeSize(type);
+
+        shader->attributeLayout.stride += attributes[location].count * attributes[location].size;
     }
 
-    smRelease(&temp);
+    smRelease(&name);
 }
