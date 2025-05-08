@@ -1,6 +1,7 @@
 #pragma once
 
 #include "defines.h"
+#include "input.h"
 
 typedef struct
 {
@@ -12,6 +13,7 @@ typedef struct
 typedef struct
 {
     void* handle;
+    smInput input;
 } smWindow;
 
 
@@ -21,20 +23,24 @@ typedef struct
  * @param info
  * @return
  */
-b32
-smWindowCreate(smWindow *window, smWindowInfo *info);
+b32 smWindowCreate(smWindow *window, smWindowInfo *info);
 
 /**
  *
  * @param window
  */
-void
-smWindowDestroy(smWindow *window);
+void smWindowDestroy(smWindow *window);
 
 /**
  *
  * @param window
  * @return
  */
-b32
-smWindowShouldClose(smWindow *window);
+b32 smWindowShouldClose(smWindow *window);
+
+/**
+ *
+ * @param window
+ * @return
+ */
+smInput smWindowGetInput(smWindow *window);

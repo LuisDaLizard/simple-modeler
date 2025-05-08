@@ -8,11 +8,13 @@
 static b8 smWindowInitialized = FALSE;
 static u8 smWindowCount = 0;
 
-b32
-smWindowCreate(smWindow *window, smWindowInfo *info)
+static void smWindowCursorPosCallback(GLFWwindow *handle, f64 x, f64 y);
+static void smWindowMouseButtonCallback(GLFWwindow *handle, int button, int action, int mods);
+
+b32 smWindowCreate(smWindow *window, smWindowInfo *info)
 {
-    assert(window != NULL);
-    assert(info != NULL);
+    assert(window);
+    assert(info);
 
     if (!smWindowInitialized)
     {
@@ -35,14 +37,18 @@ smWindowCreate(smWindow *window, smWindowInfo *info)
         return 0;
 
     glfwMakeContextCurrent(window->handle);
+    glfwSetWindowUserPointer(window->handle, window);
     glfwSwapInterval(1);
+
+    // Set window callbacks
+    glfwSetCursorPosCallback(window->handle, smWindowCursorPosCallback);
+    glfwSetMouseButtonCallback(window->handle, smWindowMouseButtonCallback);
 
     smWindowCount ++;
     return 1;
 }
 
-void
-smWindowDestroy(smWindow *window)
+void smWindowDestroy(smWindow *window)
 {
     assert(window);
     assert(window->handle);
@@ -59,8 +65,7 @@ smWindowDestroy(smWindow *window)
     }
 }
 
-b32
-smWindowShouldClose(smWindow *window)
+b32 smWindowShouldClose(smWindow *window)
 {
     assert(window);
     assert(window->handle);
@@ -71,5 +76,32 @@ smWindowShouldClose(smWindow *window)
 
     glfwPollEvents();
     glfwSwapBuffers(window->handle);
+
+    smInputNewFrame(&window->input);
+
     return glfwWindowShouldClose(window->handle);
+}
+
+smInput smWindowGetInput(smWindow *window)
+{
+    assert(window);
+    assert(window->handle);
+
+    return window->input;
+}
+
+static void smWindowCursorPosCallback(GLFWwindow *handle, f64 x, f64 y)
+{
+    smWindow *window = (smWindow *)glfwGetWindowUserPointer(handle);
+
+    window->input.mouseState.x = (f32)x;
+    window->input.mouseState.y = (f32)y;
+}
+
+static void smWindowMouseButtonCallback(GLFWwindow *handle, i32 button, i32 action, i32 mods)
+{
+    smWindow *window = (smWindow *)glfwGetWindowUserPointer(handle);
+
+    if (button < MOUSE_BUTTON_MAX)
+        window->input.mouseState.buttons[button] = (b8)action;
 }
