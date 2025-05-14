@@ -11,6 +11,9 @@ typedef struct
     i32 indexCount;
     u32 *indices;
 
+    b8 dynamicVertex;
+    b8 dynamicIndex;
+
     smAttributeLayout layout;
 } smMeshInfo;
 
@@ -34,3 +37,9 @@ smMeshDestroy(smMesh *mesh);
 
 void
 smMeshDraw(smMesh *mesh);
+
+void
+smMeshSetVertexData(smMesh *mesh, f32 *data, u32 size, u32 offset);
+
+void
+smMeshSetIndexData(smMesh *mesh, u32 *data, u32 size, u32 offset);

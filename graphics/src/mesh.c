@@ -21,13 +21,13 @@ smMeshCreate(smMesh *mesh, smMeshInfo *info)
 
     glBindVertexArray(mesh->vao);
     glBindBuffer(GL_ARRAY_BUFFER, mesh->vbo);
-    glBufferData(GL_ARRAY_BUFFER, info->vertexDataSize, info->vertices, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, info->vertexDataSize, info->vertices, info->dynamicVertex ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
 
     if (info->indexCount > 0)
     {
         glGenBuffers(1, &mesh->ebo);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->ebo);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, info->indexCount * sizeof(u32), info->indices, GL_STATIC_DRAW);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, info->indexCount * sizeof(u32), info->indices, info->dynamicIndex ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
     }
 
     u64 offset = 0;
@@ -64,6 +64,38 @@ smMeshDraw(smMesh *mesh)
         glDrawElements(GL_TRIANGLES, mesh->indexCount, GL_UNSIGNED_INT, 0);
     else
         glDrawArrays(GL_TRIANGLES, 0, mesh->vertexCount);
+
+    glBindVertexArray(0);
+}
+
+void
+smMeshSetVertexData(smMesh *mesh, f32 *data, u32 size, u32 offset)
+{
+    assert(mesh);
+    assert(data);
+    assert(size > 0);
+    assert(size <= mesh->vertexCount * mesh->layout.stride);
+    assert(offset + size <= mesh->vertexCount * mesh->layout.stride);
+
+    glBindVertexArray(mesh->vao);
+
+    glBufferSubData(GL_ARRAY_BUFFER, offset, size, data);
+
+    glBindVertexArray(0);
+}
+
+void
+smMeshSetIndexData(smMesh *mesh, u32 *data, u32 size, u32 offset)
+{
+    assert(mesh);
+    assert(data);
+    assert(size > 0);
+    assert(size <= mesh->vertexCount * mesh->layout.stride);
+    assert(offset + size <= mesh->vertexCount * mesh->layout.stride);
+
+    glBindVertexArray(mesh->vao);
+
+    glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, offset, size, data);
 
     glBindVertexArray(0);
 }
