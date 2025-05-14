@@ -10,7 +10,6 @@ smMeshCreate(smMesh *mesh, smMeshInfo *info)
     assert(info->vertexDataSize);
     assert(info->layout.stride);
     assert(info->vertexDataSize % info->layout.stride == 0);
-    if (info->indexCount > 0) assert(info->indices);
 
     mesh->vertexCount = (i32)(info->vertexDataSize / info->layout.stride);
     mesh->layout = info->layout;
