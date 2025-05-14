@@ -10,9 +10,11 @@ smMeshCreate(smMesh *mesh, smMeshInfo *info)
     assert(info->vertexDataSize);
     assert(info->layout.stride);
     assert(info->vertexDataSize % info->layout.stride == 0);
+    if (info->indexCount > 0) assert(info->indices);
 
-    mesh->vertexCount = info->vertexDataSize / info->layout.stride;
+    mesh->vertexCount = (i32)(info->vertexDataSize / info->layout.stride);
     mesh->layout = info->layout;
+    mesh->indexCount = info->indexCount;
 
     glGenVertexArrays(1, &mesh->vao);
     glGenBuffers(1, &mesh->vbo);
@@ -20,6 +22,13 @@ smMeshCreate(smMesh *mesh, smMeshInfo *info)
     glBindVertexArray(mesh->vao);
     glBindBuffer(GL_ARRAY_BUFFER, mesh->vbo);
     glBufferData(GL_ARRAY_BUFFER, info->vertexDataSize, info->vertices, GL_STATIC_DRAW);
+
+    if (info->indexCount > 0)
+    {
+        glGenBuffers(1, &mesh->ebo);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->ebo);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, info->indexCount * sizeof(u32), info->indices, GL_STATIC_DRAW);
+    }
 
     u64 offset = 0;
     for (i32 i = 0; i < info->layout.count; i++)
@@ -41,7 +50,9 @@ smMeshCreate(smMesh *mesh, smMeshInfo *info)
 void
 smMeshDestroy(smMesh *mesh)
 {
-
+    if (mesh->indexCount > 0) glDeleteBuffers(1, &mesh->ebo);
+    glDeleteBuffers(1, &mesh->vbo);
+    glDeleteVertexArrays(1, &mesh->vao);
 }
 
 void
@@ -49,7 +60,10 @@ smMeshDraw(smMesh *mesh)
 {
     glBindVertexArray(mesh->vao);
 
-    glDrawArrays(GL_TRIANGLES, 0, mesh->vertexCount);
+    if (mesh->indexCount > 0)
+        glDrawElements(GL_TRIANGLES, mesh->indexCount, GL_UNSIGNED_INT, 0);
+    else
+        glDrawArrays(GL_TRIANGLES, 0, mesh->vertexCount);
 
     glBindVertexArray(0);
 }
