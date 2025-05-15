@@ -72,14 +72,13 @@ b32 smWindowShouldClose(smWindow *window)
     assert(window);
     assert(window->handle);
 
+    glfwSwapBuffers(window->handle);
+
     int width, height;
     glfwGetFramebufferSize(window->handle, &width, &height);
     glViewport(0, 0, width, height);
-
-    glfwPollEvents();
-    glfwSwapBuffers(window->handle);
-
     smInputNewFrame(&window->input);
+    glfwPollEvents();
 
     return glfwWindowShouldClose(window->handle);
 }

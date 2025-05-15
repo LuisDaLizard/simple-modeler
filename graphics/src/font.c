@@ -6,49 +6,38 @@
 #define NK_INCLUDE_FONT_BAKING
 #define NK_INCLUDE_DEFAULT_FONT
 #define NK_INCLUDE_VERTEX_BUFFER_OUTPUT
+#define NK_INCLUDE_STANDARD_IO
+#define NK_INCLUDE_STANDARD_VARARGS
 #include <nuklear.h>
 
 b32
-smFontCreate(smFont *font)
+smFontCreateDefault(smFont *font)
 {
     assert(font);
 
     smAllocate(&font->nkAtlas, sizeof(struct nk_font_atlas), TRUE);
+    smAllocate(&font->nkTextureNull, sizeof(struct nk_draw_null_texture), TRUE);
     struct nk_font_atlas *atlas = (struct nk_font_atlas *)font->nkAtlas.ptr;
+    struct nk_draw_null_texture *null = (struct nk_draw_null_texture *)font->nkTextureNull.ptr;
 
     nk_font_atlas_init_default(atlas);
     nk_font_atlas_begin(atlas);
-    font->nkFont = nk_font_atlas_add_default(atlas, 24, 0);
+    font->nkFont = nk_font_atlas_add_default(atlas, 16, 0);
+    atlas->default_font = font->nkFont;
     i32 width, height;
-    const u8 *img = nk_font_atlas_bake(atlas, &width, &height, NK_FONT_ATLAS_ALPHA8);
-
-    // Flip the image TODO: find a more efficient way
-    smMem flippedImg = {};
-    smAllocate(&flippedImg, width * height, FALSE);
-
-    for (i32 i = 0; i < height; i++)
-    {
-        for (i32 j = 0; j < width; j++)
-        {
-            i32 index = i * width + j;
-            i32 flippedIndex = (height - i - 1) * width + j;
-
-            ((u8 *)flippedImg.ptr)[flippedIndex] = img[index];
-        }
-    }
+    const u8 *img = nk_font_atlas_bake(atlas, &width, &height, NK_FONT_ATLAS_RGBA32);
 
     // Turn the image into a texture
     smTextureInfo textureInfo =
     {
             WRAP_REPEAT, WRAP_REPEAT,
             FILTER_NEAREST, FILTER_NEAREST,
-            width, height, 1,
-            flippedImg.ptr,
+            width, height, 4,
+            img,
     };
 
     smTextureCreate(&font->texture, &textureInfo);
-    nk_font_atlas_end(atlas, nk_handle_ptr(&font->texture), NULL);
-    smRelease(&flippedImg);
+    nk_font_atlas_end(atlas, nk_handle_ptr(&font->texture), null);
 
     return TRUE;
 }
@@ -62,4 +51,5 @@ smFontDestroy(smFont *font)
     smTextureDestroy(&font->texture);
 
     smRelease(&font->nkAtlas);
+    smRelease(&font->nkTextureNull);
 }

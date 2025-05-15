@@ -6,6 +6,7 @@
 
 #include "constants.h"
 #include "shaders.h"
+#include "ui.h"
 
 #if WIN32
 #include <windows.h>
@@ -31,38 +32,22 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
     if (!smGraphicsInit())
         return 1;
 
-    smShaderInfo shaderInfo =
-    {
-            DEFAULT_VERTEX_SHADER,
-            DEFAULT_FRAGMENT_SHADER
-    };
+    smUI ui = {};
+    smUICreate(&ui);
 
-    smShader shader = {};
-    smShaderCreate(&shader, &shaderInfo);
-
-    smMeshInfo meshInfo =
-    {
-            sizeof(VERTICES),
-            VERTICES,
-            shader.attributeLayout
-    };
-
-    smMesh mesh = {};
-    smMeshCreate(&mesh, &meshInfo);
-
-    smFont font;
-    smFontCreate(&font);
+    smClearColor(BACKGROUND_COLOR);
 
     while (!smWindowShouldClose(&window))
     {
-        smClearColor(BACKGROUND_COLOR);
+        smInput input = smWindowGetInput(&window);
+        smUIHandleInput(&ui, input);
+
         smClear(FALSE);
 
-        smShaderBind(&shader);
-        smTextureBind(&font.texture, 0);
-        smMeshDraw(&mesh);
+        smUIRender(&ui);
     }
 
+    smUIDestroy(&ui);
     smWindowDestroy(&window);
 
     return 0;

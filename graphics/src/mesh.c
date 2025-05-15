@@ -20,13 +20,13 @@ smMeshCreate(smMesh *mesh, smMeshInfo *info)
 
     glBindVertexArray(mesh->vao);
     glBindBuffer(GL_ARRAY_BUFFER, mesh->vbo);
-    glBufferData(GL_ARRAY_BUFFER, info->vertexDataSize, info->vertices, info->dynamicVertex ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, info->vertexDataSize, info->vertices, info->streamVertex ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
 
     if (info->indexCount > 0)
     {
         glGenBuffers(1, &mesh->ebo);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->ebo);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, info->indexCount * sizeof(u32), info->indices, info->dynamicIndex ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, info->indexCount * sizeof(u32), info->indices, info->streamIndex ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
     }
 
     u64 offset = 0;
@@ -67,34 +67,32 @@ smMeshDraw(smMesh *mesh)
     glBindVertexArray(0);
 }
 
-void
-smMeshSetVertexData(smMesh *mesh, f32 *data, u32 size, u32 offset)
+void *
+smMeshMapVertexBuffer(smMesh *mesh)
 {
-    assert(mesh);
-    assert(data);
-    assert(size > 0);
-    assert(size <= mesh->vertexCount * mesh->layout.stride);
-    assert(offset + size <= mesh->vertexCount * mesh->layout.stride);
-
     glBindVertexArray(mesh->vao);
-
-    glBufferSubData(GL_ARRAY_BUFFER, offset, size, data);
-
-    glBindVertexArray(0);
+    void *handle = glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
+    return handle;
 }
 
 void
-smMeshSetIndexData(smMesh *mesh, u32 *data, u32 size, u32 offset)
+smMeshUnmapVertexBuffer(smMesh *mesh)
 {
-    assert(mesh);
-    assert(data);
-    assert(size > 0);
-    assert(size <= mesh->vertexCount * mesh->layout.stride);
-    assert(offset + size <= mesh->vertexCount * mesh->layout.stride);
-
     glBindVertexArray(mesh->vao);
+    glUnmapBuffer(GL_ARRAY_BUFFER);
+}
 
-    glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, offset, size, data);
+void *
+smMeshMapIndexBuffer(smMesh *mesh)
+{
+    glBindVertexArray(mesh->vao);
+    void *handle = glMapBuffer(GL_ELEMENT_ARRAY_BUFFER, GL_WRITE_ONLY);
+    return handle;
+}
 
-    glBindVertexArray(0);
+void
+smMeshUnmapIndexBuffer(smMesh *mesh)
+{
+    glBindVertexArray(mesh->vao);
+    glUnmapBuffer(GL_ELEMENT_ARRAY_BUFFER);
 }

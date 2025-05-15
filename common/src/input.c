@@ -7,7 +7,6 @@ smInputNewFrame(smInput *input)
 {
     assert(input);
     memcpy(&input->prevMouseState, &input->mouseState, sizeof(smMouse));
-    input->mouseState = (smMouse){ 0 };
 }
 
 f32

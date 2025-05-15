@@ -9,4 +9,7 @@ void
 smClearColor(rgba8 color);
 
 void
+smClearColorF(rgba32f color);
+
+void
 smClear(b32 depth);

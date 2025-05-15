@@ -9,7 +9,11 @@ smGraphicsInit()
         return 0;
 
     glEnable(GL_BLEND);
+    glBlendEquation(GL_FUNC_ADD);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    glDisable(GL_CULL_FACE);
+    glDisable(GL_DEPTH_TEST);
 
     return 1;
 }
@@ -23,6 +27,12 @@ smClearColor(const rgba8 color)
     f32 a = (f32)color.a / 255.0f;
 
     glClearColor(r, g, b, a);
+}
+
+void
+smClearColorF(const rgba32f color)
+{
+    glClearColor(color.r, color.g, color.b, color.a);
 }
 
 void

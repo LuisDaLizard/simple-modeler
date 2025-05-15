@@ -9,11 +9,12 @@ typedef struct
 {
     smMem nkAtlas;
     void *nkFont;
+    smMem nkTextureNull;
     smTexture texture;
 } smFont;
 
 b32
-smFontCreate(smFont *font);
+smFontCreateDefault(smFont *font);
 
 void
 smFontDestroy(smFont *font);

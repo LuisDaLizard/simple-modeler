@@ -25,6 +25,7 @@ typedef i32                         b32;
 typedef i64                         b64;
 
 typedef struct { u8 r, g, b, a; }   rgba8;
+typedef struct { f32 r, g, b, a; }  rgba32f;
 
 static_assert(sizeof(i8) == 1, "i8 must be 1 byte");
 static_assert(sizeof(i16) == 2, "i16 must be 2 bytes");

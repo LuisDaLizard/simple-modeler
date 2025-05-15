@@ -11,8 +11,8 @@ typedef struct
     i32 indexCount;
     u32 *indices;
 
-    b8 dynamicVertex;
-    b8 dynamicIndex;
+    b8 streamVertex;
+    b8 streamIndex;
 
     smAttributeLayout layout;
 } smMeshInfo;
@@ -38,8 +38,14 @@ smMeshDestroy(smMesh *mesh);
 void
 smMeshDraw(smMesh *mesh);
 
-void
-smMeshSetVertexData(smMesh *mesh, f32 *data, u32 size, u32 offset);
+void *
+smMeshMapVertexBuffer(smMesh *mesh);
 
 void
-smMeshSetIndexData(smMesh *mesh, u32 *data, u32 size, u32 offset);
+smMeshUnmapVertexBuffer(smMesh *mesh);
+
+void *
+smMeshMapIndexBuffer(smMesh *mesh);
+
+void
+smMeshUnmapIndexBuffer(smMesh *mesh);
