@@ -13,6 +13,7 @@ typedef struct
     smMem cmds;
     smShader shader;
     smMesh mesh;
+    u32 width, height;
 } smUI;
 
 b32 smUICreate(smUI *ui);

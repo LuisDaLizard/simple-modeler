@@ -77,6 +77,11 @@ b32 smWindowShouldClose(smWindow *window)
     int width, height;
     glfwGetFramebufferSize(window->handle, &width, &height);
     glViewport(0, 0, width, height);
+
+    glfwGetWindowSize(window->handle, &width, &height);
+    window->input.width = width;
+    window->input.height = height;
+
     smInputNewFrame(&window->input);
     glfwPollEvents();
 

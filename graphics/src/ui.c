@@ -19,7 +19,7 @@
 #define MAX_VERTEX_BUFFER_SIZE (512 * 1024)
 #define MAX_ELEMENT_BUFFER_SIZE (128 * 1024)
 
-static float value = 0.5f;
+static int value = 0;
 static struct nk_colorf bg;
 static b8 closed = FALSE;
 
@@ -86,6 +86,9 @@ void smUIHandleInput(smUI *ui, smInput input)
     i32 x = (i32)input.mouseState.x;
     i32 y = (i32)input.mouseState.y;
 
+    ui->width = input.width;
+    ui->height = input.height;
+
     nk_input_begin(ctx);
 
     nk_input_motion(ctx, x, y);
@@ -98,9 +101,9 @@ void smUIHandleInput(smUI *ui, smInput input)
     // TODO: Test ui code
     if (!closed)
     {
-        if (nk_begin(ctx, "Show", nk_rect(50, 50, 230, 250),
-                     NK_WINDOW_BORDER|NK_WINDOW_MOVABLE|NK_WINDOW_SCALABLE|
-                     NK_WINDOW_MINIMIZABLE|NK_WINDOW_TITLE | NK_WINDOW_CLOSABLE))
+        if (nk_begin(ctx, "Show", nk_rect(0, 0, 230, 250),
+                     NK_WINDOW_BORDER|NK_WINDOW_SCALABLE|
+                     NK_WINDOW_TITLE | NK_WINDOW_BACKGROUND))
         {
             nk_layout_row_static(ctx, 30, 80, 1);
             if (nk_button_label(ctx, "button"))
@@ -171,7 +174,7 @@ void smUIRender(smUI *ui)
     smMeshUnmapVertexBuffer(&ui->mesh);
     smMeshUnmapIndexBuffer(&ui->mesh);
 
-    mat4s projection = glms_ortho(0, 800, 600, 0, -1, 1);
+    mat4s projection = glms_ortho(0, (f32)ui->width, (f32)ui->height, 0, -1, 1);
 
     smShaderSetUniformMat4(&ui->shader, "uProjection", projection);
     smShaderBind(&ui->shader);

@@ -24,6 +24,7 @@ typedef struct
 typedef struct
 {
     smMouse mouseState, prevMouseState;
+    u32 width, height;
 } smInput;
 
 void
