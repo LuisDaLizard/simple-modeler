@@ -46,6 +46,9 @@ static_assert(sizeof(b64) == 8, "b64 must be 8 bytes");
 
 static_assert(sizeof(rgba8) == 4, "rgba8 must be 4 bytes");
 
+#define RGBA8(r, g, b, a) ((rgba8){r, g, b, a})
+#define RGBA8_FROM_RGBA32F(x) ((rgba8){x.r * 255, x.g * 255, x.b * 255, x.a * 255})
+#define RGBA32F_FROM_RGBA8(x) ((rgba32f){x.r / 255.0f, x.g / 255.0f, x.b / 255.0f, x.a / 255.0f})
 #define HEX_TO_RGBA8(hex) { hex & 0xFF, (hex >> 8) & 0xFF, (hex >> 16) & 0xFF, (hex >> 24) & 0xFF }
 #define RGBA8_TO_HEX(rgba8) ( *((u32*)&rgba8) )
 
@@ -53,6 +56,8 @@ static_assert(sizeof(rgba8) == 4, "rgba8 must be 4 bytes");
 #define U16_MAX     0xFFFF
 #define U32_MAX     0xFFFFFFFF
 #define U64_MAX     0xFFFFFFFFFFFFFFFF
+
+#define FLAG(x) (1 << (x))
 
 void
 smQuit(i32 code);

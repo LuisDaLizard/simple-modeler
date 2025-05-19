@@ -7,6 +7,10 @@
 #include "constants.h"
 #include "shaders.h"
 #include "ui.h"
+#include "styles/dark.h"
+#include "styles/light.h"
+#include "styles/dracula.h"
+#include "styles/catppuccin_latte.h"
 
 #if WIN32
 #include <windows.h>
@@ -34,6 +38,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 
     smUI ui = {};
     smUICreate(&ui);
+    smUISetStyle(&ui, smStyleDark());
 
     smClearColor(BACKGROUND_COLOR);
 
@@ -41,6 +46,8 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
     {
         smInput input = smWindowGetInput(&window);
         smUIHandleInput(&ui, input);
+
+        smUITest(&ui);
 
         smClear(FALSE);
 
