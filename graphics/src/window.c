@@ -9,7 +9,10 @@ static b8 smWindowInitialized = FALSE;
 static u8 smWindowCount = 0;
 
 static void smWindowCursorPosCallback(GLFWwindow *handle, f64 x, f64 y);
-static void smWindowMouseButtonCallback(GLFWwindow *handle, int button, int action, int mods);
+static void smWindowMouseButtonCallback(GLFWwindow *handle, i32 button, i32 action, i32 mods);
+static void smWindowScrollCallback(GLFWwindow *handle, f64 x, f64 y);
+static void smWindowCharCallback(GLFWwindow *handle, u32 codepoint);
+static void smWindowKeyCallback(GLFWwindow *handle, i32 key, i32 scancode, i32 action, i32 mods);
 
 b32 smWindowCreate(smWindow *window, smWindowInfo *info)
 {
@@ -45,6 +48,9 @@ b32 smWindowCreate(smWindow *window, smWindowInfo *info)
     // Set window callbacks
     glfwSetCursorPosCallback(window->handle, smWindowCursorPosCallback);
     glfwSetMouseButtonCallback(window->handle, smWindowMouseButtonCallback);
+    glfwSetScrollCallback(window->handle, smWindowScrollCallback);
+    glfwSetCharCallback(window->handle, smWindowCharCallback);
+    glfwSetKeyCallback(window->handle, smWindowKeyCallback);
 
     smWindowCount ++;
     return 1;
@@ -76,6 +82,8 @@ b32 smWindowShouldClose(smWindow *window)
 
     int width, height;
     glfwGetFramebufferSize(window->handle, &width, &height);
+    window->input.framebufferWidth = width;
+    window->input.framebufferHeight = height;
     glViewport(0, 0, width, height);
 
     glfwGetWindowSize(window->handle, &width, &height);
@@ -100,8 +108,8 @@ static void smWindowCursorPosCallback(GLFWwindow *handle, f64 x, f64 y)
 {
     smWindow *window = (smWindow *)glfwGetWindowUserPointer(handle);
 
-    window->input.mouseState.x = (f32)x;
-    window->input.mouseState.y = (f32)y;
+    window->input.mouse.x = (f32)x;
+    window->input.mouse.y = (f32)y;
 }
 
 static void smWindowMouseButtonCallback(GLFWwindow *handle, i32 button, i32 action, i32 mods)
@@ -109,5 +117,32 @@ static void smWindowMouseButtonCallback(GLFWwindow *handle, i32 button, i32 acti
     smWindow *window = (smWindow *)glfwGetWindowUserPointer(handle);
 
     if (button < MOUSE_BUTTON_MAX)
-        window->input.mouseState.buttons[button] = (b8)action;
+        window->input.mouse.buttons[button] = (b8)action;
+}
+
+static void smWindowScrollCallback(GLFWwindow *handle, f64 x, f64 y)
+{
+    smWindow *window = (smWindow *)glfwGetWindowUserPointer(handle);
+
+    window->input.mouse.scrollX += (f32)x;
+    window->input.mouse.scrollY += (f32)y;
+}
+
+static void smWindowCharCallback(GLFWwindow *handle, u32 codepoint)
+{
+    smWindow *window = (smWindow *)glfwGetWindowUserPointer(handle);
+
+    if (window->input.textLength < TEXT_MAX_LENGTH)
+    {
+        window->input.text[window->input.textLength] = codepoint;
+        window->input.textLength ++;
+    }
+}
+
+static void smWindowKeyCallback(GLFWwindow *handle, i32 key, i32 scancode, i32 action, i32 mods)
+{
+    smWindow *window = (smWindow *)glfwGetWindowUserPointer(handle);
+
+    if (key < KEY_MAX)
+        window->input.keyboard.keys[key] = (b8)action;
 }

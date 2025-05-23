@@ -38,7 +38,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 
     smUI ui = {};
     smUICreate(&ui);
-    smUISetStyle(&ui, smStyleDark());
+    smUISetStyle(&ui, smStyleDracula());
 
     smClearColor(BACKGROUND_COLOR);
 

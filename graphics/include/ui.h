@@ -15,6 +15,7 @@ typedef struct
     smShader shader;
     smMesh mesh;
     u32 width, height;
+    f32 scaleX, scaleY;
 } smUI;
 
 typedef enum

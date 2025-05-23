@@ -88,18 +88,29 @@ void smUIHandleInput(smUI *ui, smInput input)
     assert(ui);
 
     struct nk_context *ctx = ui->context.ptr;
-    i32 x = (i32)input.mouseState.x;
-    i32 y = (i32)input.mouseState.y;
+    i32 x = (i32)input.mouse.x;
+    i32 y = (i32)input.mouse.y;
 
     ui->width = input.width;
     ui->height = input.height;
 
+    ui->scaleX = (f32)input.framebufferWidth / (f32)input.width;
+    ui->scaleY = (f32)input.framebufferHeight / (f32)input.height;
+
     nk_input_begin(ctx);
 
+    for (i32 i = 0; i < input.textLength; i++)
+        nk_input_unicode(ctx, input.text[i]);
+
     nk_input_motion(ctx, x, y);
-    nk_input_button(ctx, NK_BUTTON_LEFT, x, y, input.mouseState.buttons[MOUSE_BUTTON_LEFT]);
-    nk_input_button(ctx, NK_BUTTON_RIGHT, x, y, input.mouseState.buttons[MOUSE_BUTTON_RIGHT]);
-    nk_input_button(ctx, NK_BUTTON_MIDDLE, x, y, input.mouseState.buttons[MOUSE_BUTTON_MIDDLE]);
+    nk_input_button(ctx, NK_BUTTON_LEFT, x, y, input.mouse.buttons[MOUSE_BUTTON_LEFT]);
+    nk_input_button(ctx, NK_BUTTON_RIGHT, x, y, input.mouse.buttons[MOUSE_BUTTON_RIGHT]);
+    nk_input_button(ctx, NK_BUTTON_MIDDLE, x, y, input.mouse.buttons[MOUSE_BUTTON_MIDDLE]);
+    nk_input_scroll(ctx, nk_vec2(input.mouse.scrollX, input.mouse.scrollY));
+
+    if (smIsKeyDown(input, KEY_DELETE)) nk_input_key(ctx, NK_KEY_DEL, input.keyboard.keys[KEY_DELETE]);
+    if (smIsKeyDown(input, KEY_BACKSPACE)) nk_input_key(ctx, NK_KEY_BACKSPACE, input.keyboard.keys[KEY_BACKSPACE]);
+    if (smIsKeyDown(input, KEY_ENTER)) nk_input_key(ctx, NK_KEY_ENTER, input.keyboard.keys[KEY_ENTER]);
 
     nk_input_end(ctx);
 }
@@ -141,9 +152,14 @@ void smUIRender(smUI *ui)
     smMeshUnmapVertexBuffer(&ui->mesh);
     smMeshUnmapIndexBuffer(&ui->mesh);
 
+    glDisable(GL_CULL_FACE);
+    glDisable(GL_DEPTH_TEST);
+    glEnable(GL_SCISSOR_TEST);
+
     mat4s projection = glms_ortho(0, (f32)ui->width, (f32)ui->height, 0, -1, 1);
 
     smShaderSetUniformMat4(&ui->shader, "uProjection", projection);
+    smShaderSetUniform2f(&ui->shader, "uScreenSize", (vec2s){ui->width, ui->height});
     smShaderBind(&ui->shader);
 
     u32 offset = 0;
@@ -154,11 +170,19 @@ void smUIRender(smUI *ui)
         smTexture *texture = cmd->texture.ptr;
         smTextureBind(texture, 0);
 
+        glScissor(cmd->clip_rect.x * ui->scaleX,
+                  (ui->height - (cmd->clip_rect.y + cmd->clip_rect.h)) * ui->scaleY,
+                  cmd->clip_rect.w * ui->scaleX,
+                  cmd->clip_rect.h * ui->scaleY);
+
         glDrawElements(GL_TRIANGLES, cmd->elem_count, GL_UNSIGNED_SHORT, (const void *) offset);
 
         offset += cmd->elem_count * sizeof(nk_draw_index);
     }
 
+    glEnable(GL_CULL_FACE);
+    glEnable(GL_DEPTH_TEST);
+    glDisable(GL_SCISSOR_TEST);
 
     nk_clear(ui->context.ptr);
     nk_buffer_clear(ui->cmds.ptr);
