@@ -15,10 +15,10 @@ smFontCreateDefault(smFont *font)
 {
     assert(font);
 
-    smAllocate(&font->nkAtlas, sizeof(struct nk_font_atlas), TRUE);
-    smAllocate(&font->nkTextureNull, sizeof(struct nk_draw_null_texture), TRUE);
-    struct nk_font_atlas *atlas = (struct nk_font_atlas *)font->nkAtlas.ptr;
-    struct nk_draw_null_texture *null = (struct nk_draw_null_texture *)font->nkTextureNull.ptr;
+    font->nkAtlas = smAlloc(sizeof(struct nk_font_atlas), TRUE);
+    font->nkTextureNull = smAlloc(sizeof(struct nk_draw_null_texture), TRUE);
+    struct nk_font_atlas *atlas = (struct nk_font_atlas *)font->nkAtlas;
+    struct nk_draw_null_texture *null = (struct nk_draw_null_texture *)font->nkTextureNull;
 
     nk_font_atlas_init_default(atlas);
     nk_font_atlas_begin(atlas);
@@ -47,9 +47,9 @@ smFontDestroy(smFont *font)
 {
     assert(font);
 
-    nk_font_atlas_cleanup((struct nk_font_atlas *)&font->nkAtlas.ptr);
+    nk_font_atlas_cleanup(font->nkAtlas);
     smTextureDestroy(&font->texture);
 
-    smRelease(&font->nkAtlas);
-    smRelease(&font->nkTextureNull);
+    smFree(font->nkAtlas);
+    smFree(font->nkTextureNull);
 }

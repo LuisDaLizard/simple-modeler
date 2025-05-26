@@ -87,7 +87,7 @@ smShaderDestroy(smShader *shader)
     assert(shader);
     assert(shader->program);
 
-    smRelease(&shader->uniformLayout.uniforms);
+    smFree(shader->uniformLayout.uniforms);
     glDeleteProgram(shader->program);
 }
 
@@ -213,36 +213,36 @@ smShaderGLShaderTypeSize(u32 glType)
 static void
 smShaderUniformLayout(smShader *shader)
 {
-    smMem temp = { 0 };
+    void *temp;
     i32 bufferSize;
 
     glGetProgramiv(shader->program, GL_ACTIVE_UNIFORMS, &shader->uniformLayout.count);
 
     if (shader->uniformLayout.count == 0) return;
 
-    smAllocate(&shader->uniformLayout.uniforms, shader->uniformLayout.count * sizeof(smUniform), FALSE);
+    shader->uniformLayout.uniforms = smAlloc(shader->uniformLayout.count * sizeof(smUniform), FALSE);
     glGetProgramiv(shader->program, GL_ACTIVE_UNIFORM_MAX_LENGTH, &bufferSize);
-    smAllocate(&temp, bufferSize, TRUE);
+    temp = smAlloc(bufferSize, TRUE);
 
-    smUniform *uniforms = shader->uniformLayout.uniforms.ptr;
+    smUniform *uniforms = shader->uniformLayout.uniforms;
 
     for (i32 i = 0; i < shader->uniformLayout.count; i++)
     {
         i32 length;
         u32 type;
 
-        glGetActiveUniform(shader->program, i, bufferSize, &length, &uniforms[i].count, &type, temp.ptr);
+        glGetActiveUniform(shader->program, i, bufferSize, &length, &uniforms[i].count, &type, temp);
         uniforms[i].type = smShaderGLShaderType(type);
         uniforms[i].size = smShaderGLShaderTypeSize(type);
     }
 
-    smRelease(&temp);
+    smFree(temp);
 }
 
 static void
 smShaderAttributeLayout(smShader *shader)
 {
-    smMem name = { 0 };
+    void *name;
     i32 bufferSize;
 
     shader->attributeLayout.stride = 0;
@@ -250,11 +250,11 @@ smShaderAttributeLayout(smShader *shader)
 
     if (shader->attributeLayout.count == 0) return;
 
-    smAllocate(&shader->attributeLayout.attributes, shader->attributeLayout.count * sizeof(smAttribute), FALSE);
+    shader->attributeLayout.attributes = smAlloc(shader->attributeLayout.count * sizeof(smAttribute), FALSE);
     glGetProgramiv(shader->program, GL_ACTIVE_ATTRIBUTE_MAX_LENGTH, &bufferSize);
-    smAllocate(&name, bufferSize, TRUE);
+    name = smAlloc(bufferSize, TRUE);
 
-    smAttribute *attributes = shader->attributeLayout.attributes.ptr;
+    smAttribute *attributes = shader->attributeLayout.attributes;
 
     for (i32 i = 0; i < shader->attributeLayout.count; i++)
     {
@@ -262,10 +262,10 @@ smShaderAttributeLayout(smShader *shader)
         u32 type;
         i32 count;
 
-        glGetActiveAttrib(shader->program, i, bufferSize, &length, &count, &type, name.ptr);
-        ((char *)name.ptr)[length] = '\0';
+        glGetActiveAttrib(shader->program, i, bufferSize, &length, &count, &type, name);
+        ((char *)name)[length] = '\0';
 
-        i32 location = glGetAttribLocation(shader->program, name.ptr);
+        i32 location = glGetAttribLocation(shader->program, name);
 
         attributes[location].location = location;
         attributes[location].count = count;
@@ -275,7 +275,7 @@ smShaderAttributeLayout(smShader *shader)
         shader->attributeLayout.stride += attributes[location].count * attributes[location].size;
     }
 
-    smRelease(&name);
+    smFree(name);
 }
 
 static i32

@@ -1,7 +1,7 @@
 #pragma once
 
-#include <defines.h>
-#include <memory.h>
+#include "defines.h"
+#include "allocator.h"
 #include <cglm/struct.h>
 
 typedef struct
@@ -38,14 +38,14 @@ typedef struct
 typedef struct
 {
     i32 count;
-    smMem uniforms;
+    void *uniforms;
 } smUniformLayout;
 
 typedef struct
 {
     i32 count;
     i32 stride;
-    smMem attributes;
+    void *attributes;
 } smAttributeLayout;
 
 typedef struct

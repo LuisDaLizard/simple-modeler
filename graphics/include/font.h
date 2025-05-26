@@ -2,14 +2,13 @@
 
 #include "defines.h"
 #include "texture.h"
-
-#include "memory.h"
+#include "allocator.h"
 
 typedef struct
 {
-    smMem nkAtlas;
+    void *nkAtlas;
     void *nkFont;
-    smMem nkTextureNull;
+    void *nkTextureNull;
     smTexture texture;
 } smFont;
 

@@ -34,17 +34,17 @@ b32 smUICreate(smUI *ui)
 {
     assert(ui);
 
-    smAllocate(&ui->context, sizeof(struct nk_context), TRUE);
-    smAllocate(&ui->cmds, sizeof(struct nk_buffer), TRUE);
-    struct nk_context *ctx = (struct nk_context *)ui->context.ptr;
-    nk_buffer_init_default(ui->cmds.ptr);
+    ui->nkContext = smAlloc(sizeof(struct nk_context), TRUE);
+    ui->nkCmds = smAlloc(sizeof(struct nk_buffer), TRUE);
+    struct nk_context *ctx = (struct nk_context *)ui->nkContext;
+    nk_buffer_init_default(ui->nkCmds);
 
     // TODO: provide a font
     nk_init_default(ctx, 0);
 
     smFontCreateDefault(&ui->font);
 
-    struct nk_font_atlas *atlas = ui->font.nkAtlas.ptr;
+    struct nk_font_atlas *atlas = ui->font.nkAtlas;
     nk_style_set_font(ctx, &atlas->default_font->handle);
 
     smShaderInfo shaderInfo =
@@ -75,19 +75,19 @@ void smUIDestroy(smUI *ui)
 {
     assert(ui);
 
-    nk_buffer_free(ui->cmds.ptr);
-    nk_free(ui->context.ptr);
+    nk_buffer_free(ui->nkCmds);
+    nk_free(ui->nkContext);
 
     smShaderDestroy(&ui->shader);
-    smRelease(&ui->cmds);
-    smRelease(&ui->context);
+    smFree(ui->nkCmds);
+    smFree(ui->nkContext);
 }
 
 void smUIHandleInput(smUI *ui, smInput input)
 {
     assert(ui);
 
-    struct nk_context *ctx = ui->context.ptr;
+    struct nk_context *ctx = ui->nkContext;
     i32 x = (i32)input.mouse.x;
     i32 y = (i32)input.mouse.y;
 
@@ -137,7 +137,7 @@ void smUIRender(smUI *ui)
     config.vertex_layout = vertex_layout;
     config.vertex_size = sizeof(smUIVertex);
     config.vertex_alignment = NK_ALIGNOF(smUIVertex);
-    config.tex_null = *(struct nk_draw_null_texture *)ui->font.nkTextureNull.ptr;
+    config.tex_null = *(struct nk_draw_null_texture *)ui->font.nkTextureNull;
     config.circle_segment_count = 22;
     config.curve_segment_count = 22;
     config.arc_segment_count = 22;
@@ -147,7 +147,7 @@ void smUIRender(smUI *ui)
 
     nk_buffer_init_fixed(&vbuffer, vertices, MAX_VERTEX_BUFFER_SIZE);
     nk_buffer_init_fixed(&ebuffer, indices, MAX_ELEMENT_BUFFER_SIZE);
-    nk_convert(ui->context.ptr, ui->cmds.ptr, &vbuffer, &ebuffer, &config);
+    nk_convert(ui->nkContext, ui->nkCmds, &vbuffer, &ebuffer, &config);
 
     smMeshUnmapVertexBuffer(&ui->mesh);
     smMeshUnmapIndexBuffer(&ui->mesh);
@@ -163,7 +163,7 @@ void smUIRender(smUI *ui)
     smShaderBind(&ui->shader);
 
     u32 offset = 0;
-    nk_draw_foreach(cmd, ui->context.ptr, ui->cmds.ptr)
+    nk_draw_foreach(cmd, ui->nkContext, ui->nkCmds)
     {
         if (!cmd->elem_count) continue;
 
@@ -184,77 +184,77 @@ void smUIRender(smUI *ui)
     glEnable(GL_DEPTH_TEST);
     glDisable(GL_SCISSOR_TEST);
 
-    nk_clear(ui->context.ptr);
-    nk_buffer_clear(ui->cmds.ptr);
+    nk_clear(ui->nkContext);
+    nk_buffer_clear(ui->nkCmds);
 }
 
 void smUISetStyle(smUI *ui, smStyle style)
 {
-    nk_style_from_table(ui->context.ptr, (struct nk_color *)style.colors);
+    nk_style_from_table(ui->nkContext, (struct nk_color *)style.colors);
 }
 
 b32 smUIBegin(smUI *ui, const char *title, vec2s position, vec2s size, smUIWindowFlags flags)
 {
-    return nk_begin(ui->context.ptr, title, nk_rect(position.x, position.y, size.x, size.y), flags);
+    return nk_begin(ui->nkContext, title, nk_rect(position.x, position.y, size.x, size.y), flags);
 }
 
 void smUIEnd(smUI *ui)
 {
     smUILayoutRowDynamic(ui, 20, 1);
-    nk_text(ui->context.ptr, "Hello World", nk_strlen("Hello World"), NK_TEXT_LEFT);
-    nk_end(ui->context.ptr);
+    nk_text(ui->nkContext, "Hello World", nk_strlen("Hello World"), NK_TEXT_LEFT);
+    nk_end(ui->nkContext);
 }
 
 f32 smUIWidgetWidth(smUI *ui)
 {
-    return nk_widget_width(ui->context.ptr);
+    return nk_widget_width(ui->nkContext);
 }
 
 f32 smUIWidgetHeight(smUI *ui)
 {
-    return nk_widget_height(ui->context.ptr);
+    return nk_widget_height(ui->nkContext);
 }
 
 void smUILayoutRowStatic(smUI *ui, f32 height, i32 itemWidth, i32 columns)
 {
-    nk_layout_row_static(ui->context.ptr, height, itemWidth, columns);
+    nk_layout_row_static(ui->nkContext, height, itemWidth, columns);
 }
 
 void smUILayoutRowDynamic(smUI *ui, f32 height, i32 columns)
 {
-    nk_layout_row_dynamic(ui->context.ptr, height, columns);
+    nk_layout_row_dynamic(ui->nkContext, height, columns);
 }
 
 b32 smUIButtonLabel(smUI *ui, const char *title)
 {
-    return nk_button_label(ui->context.ptr, title);
+    return nk_button_label(ui->nkContext, title);
 }
 
 void smUILabel(smUI *ui, const char *title, smUITextAlignmentFlags alignment)
 {
-    nk_label(ui->context.ptr, title, alignment);
+    nk_label(ui->nkContext, title, alignment);
 }
 
 b32 smUIComboBeginColor(smUI *ui, rgba8 color, vec2s size)
 {
-    return nk_combo_begin_color(ui->context.ptr, *(struct nk_color *)&color, nk_vec2(size.x, size.y));
+    return nk_combo_begin_color(ui->nkContext, *(struct nk_color *)&color, nk_vec2(size.x, size.y));
 }
 
 void smUIComboEnd(smUI *ui)
 {
-    nk_combo_end(ui->context.ptr);
+    nk_combo_end(ui->nkContext);
 }
 
 rgba8 smUIColorPicker(smUI *ui, rgba8 color)
 {
     rgba32f current = RGBA32F_FROM_RGBA8(color);
-    struct nk_colorf c = nk_color_picker(ui->context.ptr, RGBA32F_TO_COLORF(current), NK_RGBA);
+    struct nk_colorf c = nk_color_picker(ui->nkContext, RGBA32F_TO_COLORF(current), NK_RGBA);
     return RGBA8_FROM_RGBA32F(RGBA32F_FROM_COLORF(c));
 }
 
 b32 smUIOptionLabel(smUI *ui, const char *title, b32 selected)
 {
-    return nk_option_label(ui->context.ptr, title, selected);
+    return nk_option_label(ui->nkContext, title, selected);
 }
 
 #include <limits.h> /* INT_MAX */
@@ -266,7 +266,7 @@ overview(struct nk_context *ctx);
 
 int smUITest(smUI *ui)
 {
-    return overview(ui->context.ptr);
+    return overview(ui->nkContext);
 }
 
 static int

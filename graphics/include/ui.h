@@ -10,8 +10,8 @@
 typedef struct
 {
     smFont font;
-    smMem context;
-    smMem cmds;
+    void *nkContext;
+    void *nkCmds;
     smShader shader;
     smMesh mesh;
     u32 width, height;
