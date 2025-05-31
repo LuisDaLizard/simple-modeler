@@ -32,8 +32,8 @@ const char *DEFAULT_UI_FRAGMENT_SHADER =
 
         "void main()\n"
         "{\n"
-        "    float gradX = mix(1, 0.7, gl_FragCoord.x / uScreenSize.x);\n"
-        "    float gradY = mix(1, 0.7, gl_FragCoord.y / uScreenSize.y);\n"
+        "    float gradX = mix(1.0, 0.7, gl_FragCoord.x / uScreenSize.x);\n"
+        "    float gradY = mix(1.0, 0.7, gl_FragCoord.y / uScreenSize.y);\n"
         "    vec4 gradient = vec4(vec3(gradX + gradY / 2), 1);\n"
         "    vec4 color = fColor * gradient;\n"
         "    oColor = color * vec4(texture(uTexture, fTexCoords).rgba);\n"
