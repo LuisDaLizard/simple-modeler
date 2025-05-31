@@ -2,7 +2,7 @@
 #include <graphics.h>
 #include <mesh.h>
 #include <font.h>
-#include <printf.h>
+#include <stdio.h>
 
 #include "constants.h"
 #include "shaders.h"
